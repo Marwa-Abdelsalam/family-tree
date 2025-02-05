@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyBedvUvB-X6RbvEhlawfHi6zYRZUYfs3BU</string>
+	<key>GCM_SENDER_ID</key>
+	<string>222072409221</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.familyapptree.familyAppTree</string>
+	<key>PROJECT_ID</key>
+	<string>alabdelmohsen-family-app</string>
+	<key>STORAGE_BUCKET</key>
+	<string>alabdelmohsen-family-app.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:222072409221:ios:fca0409eb40ddec7df6dec</string>
+</dict>
+</plist>

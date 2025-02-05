@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "222072409221",
+    "project_id": "alabdelmohsen-family-app",
+    "storage_bucket": "alabdelmohsen-family-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:222072409221:android:10f6a98b92313797df6dec",
+        "android_client_info": {
+          "package_name": "com.family.family_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATF7u_FD8SeUSY-cIGmzQFQsC5EfeCo20"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:222072409221:android:970da25661866681df6dec",
+        "android_client_info": {
+          "package_name": "com.family_app_tree.family_app_tree"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATF7u_FD8SeUSY-cIGmzQFQsC5EfeCo20"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:222072409221:android:356397173a141c85df6dec",
+        "android_client_info": {
+          "package_name": "com.family_tree.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATF7u_FD8SeUSY-cIGmzQFQsC5EfeCo20"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
