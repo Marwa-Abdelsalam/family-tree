@@ -11,7 +11,7 @@ import 'package:get_storage/get_storage.dart';
 
 import 'firebase_options.dart';
 
-void main()async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
   await Firebase.initializeApp(
@@ -23,11 +23,9 @@ void main()async {
 class MyApp extends StatelessWidget {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-
-
   @override
   Widget build(BuildContext context) {
-
+//family tree
     Get.put(FamilyMemberController());
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
