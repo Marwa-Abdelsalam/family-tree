@@ -16,6 +16,10 @@
 	<string>family_app_tree</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+    <string>app wants to access your photos library to upload home photo and display it in app</string>
+    <key>NSCameraUsageDescription</key>
+    <string>this app needs access to your camera so you can upload photos</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
