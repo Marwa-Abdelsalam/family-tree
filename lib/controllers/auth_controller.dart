@@ -17,11 +17,15 @@ class AuthController extends GetxController {
   final FirebaseStorage _storage = FirebaseStorage.instance;
   AppUserModel? appUserModel;
 
-  Future<void> signUpWithPhoneNumber(String phoneNumber, String name, File? profileImage) async {
+  Future<void> signUpWithPhoneNumber(
+      String phoneNumber, String name, File? profileImage) async {
     isLoading.value = true;
     try {
       // Check if the phone number already exists in the users collection
-      QuerySnapshot snapshot = await _firestore.collection('users').where('phone', isEqualTo: phoneNumber).get();
+      QuerySnapshot snapshot = await _firestore
+          .collection('users')
+          .where('phone', isEqualTo: phoneNumber)
+          .get();
       if (snapshot.docs.isNotEmpty) {
         isLoading.value = false;
         Get.snackbar('Error', 'رقم الجوال مسجل بالفعل');
@@ -44,7 +48,11 @@ class AuthController extends GetxController {
         codeSent: (String verificationId, int? resendToken) {
           this.verificationId.value = verificationId;
           isLoading.value = false;
-          Get.to(() => OtpSignInScreen(phoneNumber: phoneNumber, isSignUp: true, name: name, profileImage: profileImage));
+          Get.to(() => OtpSignInScreen(
+              phoneNumber: phoneNumber,
+              isSignUp: true,
+              name: name,
+              profileImage: profileImage));
         },
         codeAutoRetrievalTimeout: (String verificationId) {
           this.verificationId.value = verificationId;
@@ -61,7 +69,10 @@ class AuthController extends GetxController {
     final box = GetStorage();
     try {
       // Check if the phone number exists in the users collection
-      QuerySnapshot snapshot = await _firestore.collection('users').where('phone', isEqualTo: phoneNumber).get();
+      QuerySnapshot snapshot = await _firestore
+          .collection('users')
+          .where('phone', isEqualTo: phoneNumber)
+          .get();
       if (snapshot.docs.isEmpty) {
         isLoading.value = false;
         Get.snackbar('Error', 'رقم الجوال غير مسجل');
@@ -94,16 +105,18 @@ class AuthController extends GetxController {
     }
   }
 
-  Future<void> verifyOtpForSignUp(String smsCode, String phoneNumber, String name, File? profileImage) async {
+  Future<void> verifyOtpForSignUp(String smsCode, String phoneNumber,
+      String name, File? profileImage) async {
     isLoading.value = true;
     final box = GetStorage();
     try {
-      PhoneAuthCredential credential = PhoneAuthProvider.credential(verificationId: verificationId.value, smsCode: smsCode);
+      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+          verificationId: verificationId.value, smsCode: smsCode);
       await _auth.signInWithCredential(credential);
       String imageUrl = await _uploadProfileImage(profileImage);
       await _saveUserToFirestore(phoneNumber, name, imageUrl);
       box.write("signedIn", true);
-      box.write('phone',phoneNumber);
+      box.write('phone', phoneNumber);
       print("Sign in: ${box.read("signedIn")}");
       Get.offAll(() => LandingPage());
       isLoading.value = false;
@@ -117,14 +130,25 @@ class AuthController extends GetxController {
     isLoading.value = true;
     try {
       final box = GetStorage();
-      PhoneAuthCredential credential = PhoneAuthProvider.credential(verificationId: verificationId.value, smsCode: smsCode);
+      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+          verificationId: verificationId.value, smsCode: smsCode);
       await _auth.signInWithCredential(credential);
       box.write("signedIn", true);
       box.write('phone', phoneNumber);
       final store = FirebaseFirestore.instance;
       final col = await store.collection('users').get();
-      final doc = col.docs.where((element) => element['phone'] == phoneNumber,).first;
-      appUserModel = AppUserModel(auth: doc['auth'], created_at: doc['created_at'], img: doc['image_url'], username: doc['name'], phone: doc['phone']);
+      final doc = col.docs
+          .where(
+            (element) => element['phone'] == phoneNumber,
+          )
+          .first;
+      appUserModel = AppUserModel(
+          auth: doc['auth'],
+          created_at: doc['created_at'],
+          img: doc['image_url'],
+          username: doc['name'],
+          phone: doc['phone'],
+          uid: doc['uid']);
       print("Sign in: ${box.read("signedIn")}");
       update();
       isLoading.value = false;
@@ -135,26 +159,29 @@ class AuthController extends GetxController {
     }
   }
 
-  logout()async{
-    try{
+  logout() async {
+    try {
       final box = GetStorage();
       await _auth.signOut();
       Get.offAll(() => SignInScreen());
       box.write("signedIn", false);
-    }catch(e){
+    } catch (e) {
       Get.snackbar('Error', 'Can\'t logout');
     }
   }
 
   Future<String> _uploadProfileImage(File? profileImage) async {
     if (profileImage == null) return '';
-    Reference storageRef = _storage.ref().child('profile_images/${DateTime.now().millisecondsSinceEpoch}');
+    Reference storageRef = _storage
+        .ref()
+        .child('profile_images/${DateTime.now().millisecondsSinceEpoch}');
     UploadTask uploadTask = storageRef.putFile(profileImage);
     TaskSnapshot taskSnapshot = await uploadTask;
     return await taskSnapshot.ref.getDownloadURL();
   }
 
-  Future<void> _saveUserToFirestore(String phoneNumber, String name, String imageUrl) async {
+  Future<void> _saveUserToFirestore(
+      String phoneNumber, String name, String imageUrl) async {
     await _firestore.collection('users').doc(_auth.currentUser!.uid).set({
       'phone': phoneNumber,
       'name': name,

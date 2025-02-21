@@ -6,7 +6,13 @@ class AppUserModel {
   String username;
   String img;
   String phone;
+  String uid;
 
-  AppUserModel({required this.auth, required this.created_at,required this.img,required this.username, required this.phone});
-
+  AppUserModel(
+      {required this.auth,
+      required this.created_at,
+      required this.img,
+      required this.username,
+      required this.phone,
+      required this.uid});
 }

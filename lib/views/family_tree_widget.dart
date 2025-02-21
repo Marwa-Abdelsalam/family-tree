@@ -10,6 +10,7 @@ import '../controllers/family_member_controller.dart'; // Ensure this path is co
 import '../models/family_member_firestore.dart';
 import 'editMemberDetails.dart';
 import 'memberDetailsScreen.dart';
+import 'admin_requests_screen.dart';
 
 class FamilyTree extends StatefulWidget {
   const FamilyTree({super.key});
@@ -294,6 +295,11 @@ class _FamilyTreeState extends State<FamilyTree> {
         ),
       ),
       actions: [
+        if (controller.userModel?.auth == 'admin')
+          IconButton(
+            icon: const Icon(Icons.admin_panel_settings),
+            onPressed: () => getx.Get.to(() => AdminRequestsScreen()),
+          ),
         IconButton(
           icon: Icon(_isSearching ? Icons.close : Icons.search,
               color: Colors.black),
@@ -454,6 +460,7 @@ class _FamilyTreeState extends State<FamilyTree> {
     } else if (member.birthdateHijri != null &&
         member.birthdateHijri.isNotEmpty &&
         member.deathDateHijri != null &&
+        member.deathDateHijri.isNotEmpty &&
         member.lifeStatus == FamilyMemberFirestoreEnum.EMPTY) {
       String dateStr = member.birthdateHijri.split('/').reversed.join('-');
       String deathDate = member.deathDateHijri.split('/').reversed.join('-');
@@ -538,11 +545,12 @@ class _FamilyTreeState extends State<FamilyTree> {
               () => _showAddWifeDialog(member)),
         ],
         if (famCtrl.userModel!.auth != 'admin') ...[
-          _buildDialogButton(context, ' طلب تعديل البيانات', Icons.edit, () {}),
-          _buildDialogButton(
-              context, ' طلب اضافة ابناء', Icons.person_add, () {}),
-          _buildDialogButton(
-              context, ' طلب اضافة زوجة', Icons.family_restroom, () {}),
+          _buildDialogButton(context, ' طلب تعديل البيانات', Icons.edit,
+              () => _showRequestEditDialog(member)),
+          _buildDialogButton(context, ' طلب اضافة ابناء', Icons.person_add,
+              () => _showRequestAddChildrenDialog(member)),
+          _buildDialogButton(context, ' طلب اضافة زوجة', Icons.family_restroom,
+              () => _showRequestAddWifeDialog(member)),
         ],
         _buildDialogButton(context, 'عرض المسار للجذر', Icons.alt_route, () {
           famCtrl.highlightPathToRoot(member);
@@ -553,7 +561,8 @@ class _FamilyTreeState extends State<FamilyTree> {
               () => _showDeleteMemberDialog(member),
               color: Colors.red),
         if (famCtrl.userModel!.auth != 'admin')
-          _buildDialogButton(context, ' طلب حذف', Icons.delete, () {},
+          _buildDialogButton(context, ' طلب حذف', Icons.delete,
+              () => _showRequestDeleteDialog(member),
               color: Colors.red),
       ],
     );
@@ -722,6 +731,205 @@ class _FamilyTreeState extends State<FamilyTree> {
 
   void _navigateToEditMemberDetails(FamilyMemberFirestore member) {
     getx.Get.to(EditMemberDetails(member: member));
+  }
+
+  void _showRequestEditDialog(FamilyMemberFirestore member) {
+    final reasonController = TextEditingController();
+
+    getx.Get.back();
+    showDialog(
+      context: context,
+      builder: (context) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: AlertDialog(
+          title: const Text('طلب تعديل البيانات'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: reasonController,
+                decoration: const InputDecoration(
+                    labelText: 'سبب طلب التعديل',
+                    hintText: 'يرجى ذكر سبب طلب التعديل والتعديلات المطلوبة'),
+                maxLines: 3,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('إلغاء'),
+            ),
+            TextButton(
+              onPressed: () async {
+                if (reasonController.text.trim().isNotEmpty) {
+                  await controller.submitEditRequest(
+                      member, reasonController.text.trim());
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text('تم إرسال طلب التعديل بنجاح')));
+                }
+              },
+              child: const Text('إرسال الطلب'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showRequestAddChildrenDialog(FamilyMemberFirestore member) {
+    final childrenController = TextEditingController();
+    final reasonController = TextEditingController();
+
+    getx.Get.back();
+    showDialog(
+      context: context,
+      builder: (context) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: AlertDialog(
+          title: const Text('طلب إضافة أبناء'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: childrenController,
+                decoration: const InputDecoration(
+                    labelText: 'أسماء الأبناء',
+                    hintText: 'اكتب أسماء الأبناء مفصولة بفواصل'),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: reasonController,
+                decoration: const InputDecoration(
+                    labelText: 'معلومات إضافية',
+                    hintText: 'أي معلومات إضافية عن الأبناء'),
+                maxLines: 2,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('إلغاء'),
+            ),
+            TextButton(
+              onPressed: () async {
+                if (childrenController.text.trim().isNotEmpty) {
+                  await controller.submitAddChildrenRequest(
+                      member,
+                      childrenController.text.trim(),
+                      reasonController.text.trim());
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text('تم إرسال طلب إضافة الأبناء بنجاح')));
+                }
+              },
+              child: const Text('إرسال الطلب'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showRequestAddWifeDialog(FamilyMemberFirestore member) {
+    final wifeNameController = TextEditingController();
+    final reasonController = TextEditingController();
+
+    getx.Get.back();
+    showDialog(
+      context: context,
+      builder: (context) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: AlertDialog(
+          title: const Text('طلب إضافة زوجة'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: wifeNameController,
+                decoration: const InputDecoration(
+                    labelText: 'اسم الزوجة', hintText: 'اكتب اسم الزوجة'),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: reasonController,
+                decoration: const InputDecoration(
+                    labelText: 'معلومات إضافية',
+                    hintText: 'أي معلومات إضافية عن الزوجة'),
+                maxLines: 2,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('إلغاء'),
+            ),
+            TextButton(
+              onPressed: () async {
+                if (wifeNameController.text.trim().isNotEmpty) {
+                  await controller.submitAddWifeRequest(
+                      member,
+                      wifeNameController.text.trim(),
+                      reasonController.text.trim());
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text('تم إرسال طلب إضافة الزوجة بنجاح')));
+                }
+              },
+              child: const Text('إرسال الطلب'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showRequestDeleteDialog(FamilyMemberFirestore member) {
+    final reasonController = TextEditingController();
+
+    getx.Get.back();
+    showDialog(
+      context: context,
+      builder: (context) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: AlertDialog(
+          title: const Text('طلب حذف عضو'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: reasonController,
+                decoration: const InputDecoration(
+                    labelText: 'سبب طلب الحذف',
+                    hintText: 'يرجى ذكر سبب طلب حذف العضو'),
+                maxLines: 3,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('إلغاء'),
+            ),
+            TextButton(
+              onPressed: () async {
+                if (reasonController.text.trim().isNotEmpty) {
+                  await controller.submitDeleteRequest(
+                      member, reasonController.text.trim());
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text('تم إرسال طلب الحذف بنجاح')));
+                }
+              },
+              child: const Text('إرسال الطلب'),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

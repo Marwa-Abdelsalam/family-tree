@@ -52,7 +52,8 @@ class FamilyMemberController extends GetxController {
         created_at: doc['created_at'],
         img: doc['image_url'],
         username: doc['name'],
-        phone: doc['phone']);
+        phone: doc['phone'],
+        uid: doc['uid']);
     update();
   }
 
@@ -863,6 +864,84 @@ class FamilyMemberController extends GetxController {
       print("Member updated successfully: ${member.memberName}");
     } catch (e) {
       print('Error updating member: $e');
+    }
+  }
+
+  Future<void> submitEditRequest(
+      FamilyMemberFirestore member, String reason) async {
+    try {
+      await firestore.collection('requests').add({
+        'type': 'edit',
+        'memberId': member.memberId,
+        'memberName': member.memberName,
+        'reason': reason,
+        'requestedBy': userModel!.uid,
+        'requestedByName': userModel!.username,
+        'status': 'pending',
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      print('Error submitting edit request: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> submitAddChildrenRequest(FamilyMemberFirestore member,
+      String childrenNames, String additionalInfo) async {
+    try {
+      await firestore.collection('requests').add({
+        'type': 'addChildren',
+        'memberId': member.memberId,
+        'memberName': member.memberName,
+        'childrenNames': childrenNames,
+        'additionalInfo': additionalInfo,
+        'requestedBy': userModel!.uid,
+        'requestedByName': userModel!.username,
+        'status': 'pending',
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      print('Error submitting add children request: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> submitAddWifeRequest(FamilyMemberFirestore member,
+      String wifeName, String additionalInfo) async {
+    try {
+      await firestore.collection('requests').add({
+        'type': 'addWife',
+        'memberId': member.memberId,
+        'memberName': member.memberName,
+        'wifeName': wifeName,
+        'additionalInfo': additionalInfo,
+        'requestedBy': userModel!.uid,
+        'requestedByName': userModel!.username,
+        'status': 'pending',
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      print('Error submitting add wife request: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> submitDeleteRequest(
+      FamilyMemberFirestore member, String reason) async {
+    try {
+      await firestore.collection('requests').add({
+        'type': 'delete',
+        'memberId': member.memberId,
+        'memberName': member.memberName,
+        'reason': reason,
+        'requestedBy': userModel!.uid,
+        'requestedByName': userModel!.username,
+        'status': 'pending',
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      print('Error submitting delete request: $e');
+      rethrow;
     }
   }
 }
